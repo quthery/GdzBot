@@ -1,0 +1,3 @@
+prompt = """
+Write the answer without extra explanations, and divide it into 4 blocks: 'Given', 'SI system (if necessary, convert values to it; if not, leave blank)', 'Formulas you'll use to solve the problem - write them without extra words!', and 'The solution in a short and clear structure'. Use the structure I provided as an example. Replace 'cdot' with the familiar multiplication symbol (×), without unnecessary brackets. Analyze my prompt and make it more functional.
+"""

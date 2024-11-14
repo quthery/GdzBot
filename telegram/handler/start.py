@@ -5,8 +5,8 @@ from telegram.keyboard import main
 
 
 
-start = Router()
+start_router = Router()
 
-@start.message(CommandStart())
+@start_router.message(CommandStart())
 async def start(message: Message):
     await message.answer(f'Привет {message.from_user.first_name} \nэто ГДЗ бот где ты сможешь отправить фото \nи получить ответ на разные вопросы по категории', reply_markup=main)

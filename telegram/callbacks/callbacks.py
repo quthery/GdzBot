@@ -12,7 +12,7 @@ callbacks = Router()
 
 
 
-@router.callback_query(F.data == "physics")
+@callbacks.callback_query(F.data == "physics")
 async def photo(callback: CallbackQuery):
     await callback.answer(text="Ожидайте")
     filename = last_modified_file(os.path.abspath('images'))
@@ -23,7 +23,7 @@ async def photo(callback: CallbackQuery):
     os.remove(filename)
 
 
-@router.callback_query(F.data == "math")
+@callbacks.callback_query(F.data == "math")
 async def photo(callback: CallbackQuery):
     filename = last_modified_file(os.path.abspath('images'))
     await callback.message.edit_text(await gpt.answer_math(await scan_image(filename)), reply_markup=kb.answer1)

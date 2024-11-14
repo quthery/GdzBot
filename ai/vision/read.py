@@ -21,5 +21,7 @@ class Reader:
             return f.read()
 
 class FromFile(Reader):
-    async def read(self, path: str):
-        return self.from_bytes(self.to_bytes(path))
+    @classmethod
+    async def read(self, path: str) -> str:
+        text = await self.from_bytes(self.to_bytes_sync(path))
+        return text

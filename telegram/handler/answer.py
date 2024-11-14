@@ -4,12 +4,14 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from ai.answer.models import InputData
 from ai.answer.answer import Answerer
+from ai.typing import get_type
+from random import randint
+import asyncio
 
 answer = Router()
 ai = Answerer()
 class Data(StatesGroup): 
 	image = State()
-	model = State()
 	type = State()
 
 @answer.message(F.text == "Решить задание✍️")
@@ -25,27 +27,43 @@ async def set_image(message: Message, state: FSMContext):
 		return
 	await state.update_data(image=message.photo[-1].file_id)
 	await state.set_state(Data.type)
+	await message.answer("Выбери предмет чтобы решить задание🤖")
 
 
 @answer.message(Data.type)
 async def set_type(message: Message, state: FSMContext):
-	type_of_question = await ai.get_type(message.text)
-	if type_of_question is None:
-		await message.answer("Неизвестный предмет, пожалуйста используйте кнопки")
-		await state.clear()
-		return
-	await message.answer("Выбери модель чтобы решить задание🤖")
-	await state.update_data(type=type_of_question)
-	await state.set_state(Data.model)
+
+    type_of_question = await get_type(message.text)
+    print(type)
+    if type_of_question is None:
+        await message.answer("Неизвестный предмет, пожалуйста используйте кнопки")
+        await state.clear()
+        return
+
+    await state.update_data(type=type_of_question)
+    data = await state.get_data()
+ 
+    await message.answer("Считываем изображение🖼️")
+    path_to_image = f'images/{randint(1, 949888)}.jpg'
+    await message.bot.download(file=data['image'], destination=path_to_image)
+    
+    input_data = InputData(prompt=str(type_of_question), image=path_to_image, type=str(type_of_question))
+    print(input_data)
+    
+    output = await ai.create_output(input_data)
+    
+    if output is None:  # Проверка на None
+        await message.answer("Не удалось создать вывод для данного предмета.")
+        return
+    await message.answer("Структуируем запрос⌛")
+    answer = await ai.answer(output)
+    await message.answer("Ждем ответа от нейросети🌐")
+    await asyncio.sleep(5)
+    await message.answer(answer, parse_mode='Markdown')
+    await asyncio.sleep(5)
+
 	
-#TODO: Дописать это все дело
-@answer.message(Data.model)
-async def set_model(message: Message, state: FSMContext):
-	model = await ai.get_model(message.text)
-	if model is None:
-		await message.answer("Неизвестная модель, пожалуйста используйте кнопки")
-		await state.clear()
-		return
-	await state.update_data(model=model)
+	
+
 
 	
